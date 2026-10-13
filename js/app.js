@@ -18,7 +18,7 @@ const bookLink = (cls = 'btn--primary', label = 'Request an appointment') =>
 
 const stars = () => `<span class="stars" aria-hidden="true">★★★★★</span>`;
 const ratingLine = () =>
-  `<p class="rating">${stars()}<span><strong>${clinic.rating.score}</strong> from ${clinic.rating.count} ${clinic.rating.source} reviews</span></p>`;
+  `<a class="rating" href="${clinic.mapsUrl}" target="_blank" rel="noopener" aria-label="View the practice on Google Maps: ${clinic.rating.score} out of 5 from ${clinic.rating.count} reviews">${stars()}<span><strong>${clinic.rating.score}</strong> from ${clinic.rating.count} ${clinic.rating.source} reviews</span>${icon('arrowRight')}</a>`;
 
 const sectionHead = ({ eyebrow, title, lead, center }) => `
   <header class="section-head${center ? ' section-head--center' : ''}" data-reveal>
@@ -129,18 +129,24 @@ function renderHome() {
   <section class="hero">
     <div class="container hero__grid">
       <div class="hero__copy">
-        <p class="eyebrow">Family dental practice in Ranelagh Village</p>
-        <h1 class="display">Gentle, modern dentistry for the whole family.</h1>
-        <p class="lead">Dr Dermott Finnerty and Dr Eithne McKenna take a sincere interest in the dental needs of you and your family. From routine check-ups to crowns, implants and whitening, you’ll be in experienced, caring hands.</p>
+        <p class="eyebrow">Your family dentist · Dublin 6</p>
+        <h1 class="display">Gentle dentistry.<br><span>Right here in Ranelagh.</span></h1>
+        <p class="lead">A familiar face and a caring approach. Dr Dermott Finnerty and Dr Eithne McKenna welcome the whole family, including anyone feeling nervous about their visit.</p>
         <div class="btn-row">${callBtn()}${bookLink('btn--ghost')}</div>
+        <p class="hero__availability">${icon('clock')}Weekday appointments from 8am to 8pm</p>
         ${ratingLine()}
       </div>
-      <aside class="hours-card" aria-label="Opening hours">
-        <p class="status ${status.open ? 'is-open' : ''}"><span class="dot"></span>${status.text}</p>
-        <h2 class="h3">Early mornings &amp; late evenings</h2>
-        <p class="hours-card__big">8am – 8pm</p>
-        <p class="muted">Monday to Friday, so you can come before or after work.</p>
-        ${hoursList()}
+      <aside class="hero__practice" aria-label="Meet the practice and opening hours">
+        <figure class="practice-photo">
+          <img src="assets/dentists.jpg" width="350" height="225" fetchpriority="high" alt="Dr Dermott Finnerty and Dr Eithne McKenna together">
+          <figcaption><span>Experienced hands. Familiar faces.</span><a href="#/about">Meet your dentists ${icon('arrowRight')}</a></figcaption>
+        </figure>
+        <div class="hero-hours">
+          <p class="status ${status.open ? 'is-open' : ''}"><span class="dot"></span>${status.text}</p>
+          <h2 class="h3">Care that fits your day.</h2>
+          <div class="hero-hours__summary"><span>Monday – Friday<strong>8am – 8pm</strong></span><span>Saturday<strong>8.30am – 1.30pm</strong></span></div>
+          <details class="hero-hours__details"><summary>See all opening hours ${icon('chevronRight')}</summary>${hoursList()}</details>
+        </div>
       </aside>
     </div>
   </section>
@@ -148,7 +154,7 @@ function renderHome() {
   <section class="section section--flush">
     <div class="container">
       <ul class="highlights">
-        ${highlights.map((h) => `<li data-reveal>${icon(h.icon)}<strong>${h.title}</strong><span>${h.text}</span></li>`).join('')}
+        ${highlights.map((h) => `<li data-reveal>${icon(h.icon)}<div><strong>${h.title}</strong><span>${h.text}</span></div></li>`).join('')}
       </ul>
     </div>
   </section>
@@ -214,6 +220,7 @@ function renderAbout() {
   })}
   <section class="section">
     <div class="container">
+      <figure class="about-photo" data-reveal><img src="assets/dentists.jpg" width="350" height="225" alt="Dr Dermott Finnerty and Dr Eithne McKenna" loading="lazy"><figcaption><p class="eyebrow">The people behind your care</p><h2 class="h2">Two dentists.<br>One family practice.</h2><p>Get to know the husband-and-wife team caring for families in Ranelagh Village.</p></figcaption></figure>
       <div class="team">
         ${team.map((m) => `
           <article class="person" data-reveal>
@@ -323,8 +330,8 @@ function renderContact() {
   return `
   ${pageHero({
     crumb: 'Contact', eyebrow: 'Contact us',
-    title: 'Book an appointment.',
-    lead: 'Call reception, send us an email, or fill in the form below and we’ll get back to you to arrange a time.',
+    title: 'Let’s find a time that suits you.',
+    lead: 'Call reception to arrange an appointment, or prepare an email request below. The practice will confirm your appointment directly.',
     actions: callBtn() + emailBtn('btn--ghost'),
   })}
   <section class="section section--flush">
@@ -338,8 +345,9 @@ function renderContact() {
     <div class="container split">
       <div data-reveal>
         <p class="eyebrow">Appointment request</p>
-        <h2 class="h2">Tell us what you need.</h2>
-        <p class="muted">The form opens your email app with your request ready to send to the practice. For anything urgent, please call.</p>
+        <h2 class="h2">Prepare your appointment email.</h2>
+        <p class="muted">Add your details, then open the draft in your email app and send it to the practice. For anything urgent, please call.</p>
+        <ol class="request-steps" aria-label="How an appointment request works"><li><span>1</span>Add your details</li><li><span>2</span>Send your email</li><li><span>3</span>Practice confirms</li></ol>
         <form class="form" id="appt-form" novalidate>
           <div class="form__row">
             <label>Name<input name="name" required autocomplete="name"></label>
@@ -363,7 +371,9 @@ function renderContact() {
           <label class="check"><input type="checkbox" name="new"> I’m a new patient</label>
           <label>Message (optional)<textarea name="message" rows="4"></textarea></label>
           <p class="form__error" id="form-error" role="alert" hidden>Please add your name and a phone number so we can call you back.</p>
-          <button class="btn btn--primary" type="submit">${icon('send')}<span>Send request</span></button>
+          <div class="form__actions"><button class="btn btn--primary" type="submit">${icon('mail')}<span>Open email draft</span></button><button class="link-btn" type="button" id="copy-request">${icon('copy')}Copy request</button></div>
+          <p class="small muted">You’ll need to send the email yourself. Your preferred time is a request; reception will confirm availability.</p>
+          <p class="form__feedback" id="request-feedback" role="status" hidden></p>
         </form>
       </div>
       <aside class="hours-card" data-reveal aria-label="Opening hours">
@@ -411,9 +421,9 @@ function renderHeader(path) {
       <a class="logo" href="#/" aria-label="${clinic.name}, home">${logoMark}<span class="logo__text">${clinic.name}<small>${clinic.tagline}</small></span></a>
       <nav class="nav" id="nav" aria-label="Main">
         ${nav.map((n) => `<a href="#/${n.path}" ${n.path === path ? 'aria-current="page"' : ''}>${n.label}</a>`).join('')}
-        <a class="btn btn--primary nav__cta" href="${clinic.phoneHref}">${icon('phone')}<span>${clinic.phone}</span></a>
+        ${bookLink('btn--primary nav__cta', 'Request a visit')}
       </nav>
-      <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav" aria-label="Open menu">${icon('menu')}</button>
+      <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav" aria-label="Open menu">${icon('menu')}<span>Menu</span></button>
     </div>`;
   $('#menu-btn').addEventListener('click', () => toggleMenu());
 }
@@ -423,9 +433,13 @@ function toggleMenu(force) {
   const open = force ?? btn.getAttribute('aria-expanded') !== 'true';
   btn.setAttribute('aria-expanded', String(open));
   btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-  btn.innerHTML = icon(open ? 'x' : 'menu');
+  btn.innerHTML = `${icon(open ? 'x' : 'menu')}<span>${open ? 'Close' : 'Menu'}</span>`;
   $('#nav').classList.toggle('is-open', open);
   document.body.classList.toggle('menu-open', open);
+  ['#main', '#site-footer', '#action-bar', '#topbar'].forEach((selector) => {
+    $(selector).inert = open;
+  });
+  if (open) $('#nav a').focus();
 }
 
 function renderFooter() {
@@ -512,19 +526,43 @@ function bindPage() {
   // Appointment request → opens the patient's email app with a ready-to-send message.
   const form = $('#appt-form');
   if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+    const prepareRequest = () => {
       const f = new FormData(form);
       const name = (f.get('name') || '').trim();
       const phone = (f.get('phone') || '').trim();
       $('#form-error').hidden = Boolean(name && phone);
-      if (!name || !phone) return;
+      if (!name || !phone) {
+        form.elements.namedItem(name ? 'phone' : 'name').focus();
+        return null;
+      }
+      if (!form.reportValidity()) return null;
       const body = [
         `Name: ${name}`, `Phone: ${phone}`, `Email: ${f.get('email') || '-'}`,
         `Reason: ${f.get('reason')}`, `Preferred time: ${f.get('time')}`,
         `New patient: ${f.get('new') ? 'Yes' : 'No'}`, '', f.get('message') || '',
       ].join('\n');
-      window.location.href = `mailto:${clinic.email}?subject=${encodeURIComponent(`Appointment request: ${name}`)}&body=${encodeURIComponent(body)}`;
+      return { body, subject: `Appointment request: ${name}` };
+    };
+    const feedback = (message) => {
+      $('#request-feedback').textContent = message;
+      $('#request-feedback').hidden = false;
+    };
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const request = prepareRequest();
+      if (!request) return;
+      feedback('Opening your email app. Send the draft there to request your appointment. If no app opens, use Copy request and paste it into an email.');
+      window.location.href = `mailto:${clinic.email}?subject=${encodeURIComponent(request.subject)}&body=${encodeURIComponent(request.body)}`;
+    });
+    $('#copy-request').addEventListener('click', async () => {
+      const request = prepareRequest();
+      if (!request) return;
+      try {
+        await navigator.clipboard.writeText(`To: ${clinic.email}\nSubject: ${request.subject}\n\n${request.body}`);
+        feedback(`Request copied. Paste it into an email to ${clinic.email} and send it to the practice.`);
+      } catch {
+        feedback('Copy is unavailable in this browser. Use Open email draft or call reception.');
+      }
     });
   }
 }
@@ -541,6 +579,12 @@ function reveal() {
 /* ---------- router ---------- */
 let pendingScroll = null;
 document.addEventListener('click', (e) => {
+  if (e.target.closest('.skip-link')) {
+    e.preventDefault();
+    $('#main').focus();
+    $('#main').scrollIntoView({ block: 'start' });
+    return;
+  }
   const a = e.target.closest('[data-scroll]');
   if (a) {
     // Already on that page: no hashchange will fire, so scroll straight to the section.
@@ -577,5 +621,18 @@ function route() {
 
 renderFooter();
 window.addEventListener('hashchange', route);
-window.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleMenu(false); });
+window.addEventListener('keydown', (e) => {
+  if (!document.body.classList.contains('menu-open')) return;
+  if (e.key === 'Escape') { toggleMenu(false); $('#menu-btn').focus(); }
+  if (e.key === 'Tab') {
+    const controls = $$('.site-header a, .site-header button');
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 900 && document.body.classList.contains('menu-open')) toggleMenu(false);
+});
 route();
